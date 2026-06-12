@@ -1,0 +1,62 @@
+Fonte: /home/ubuntu/dev_miner/Dev_Miner/tp-es_Atualizado.pdf
+
+Resumo dos requisitos relevantes para o minerador:
+
+1. O objetivo do trabalho é estudar um repositório público do GitHub e levantar dados de interações entre colaboradores, usando grafos como estrutura central.
+
+2. Interações que devem ser mineradas com foco especial:
+   - Comentários em issues.
+   - Fechamento de issues.
+   - Comentários em pull requests.
+   - Abertura, revisão, aprovação e merge de pull requests.
+
+3. O trabalho pede modelagem de grafos separados por relação, incluindo pelo menos:
+   - Grafo 1: comentários em issues ou pull requests.
+   - Grafo 2: fechamento de issue por outro usuário.
+   - Grafo 3: revisões/aprovações/merges de pull requests.
+
+4. Também pede um grafo integrado no qual cada aresta represente combinação ponderada de todas as interações. Pesos sugeridos no PDF:
+   - Comentário em issue ou pull request: peso 2.
+   - Abertura de issue comentada por outro usuário: peso 3.
+   - Revisão/aprovação de pull request: peso 4.
+   - Merge de pull request: peso 5.
+
+5. O minerador solicitado pelo usuário deve coletar dados históricos do início do repositório até agora, ou de 3 a 5 anos atrás até agora, e gravar um arquivo JSON por item minerado.
+
+6. Campos-alvo mencionados pelo usuário para configuração:
+   - tokens.json com chave GITHUB_TOKENS: lista de 1 a 24 tokens.
+   - GITHUB_USER_TARGET: dono do repositório/alvo, por exemplo "microsoft".
+   - GITHUB_REPO_TARGET: nome do repositório/alvo, por exemplo "TypeScript".
+
+7. Requisitos operacionais pedidos pelo usuário:
+   - Implementação em ./Gama.
+   - Minerador multithread com 1 a 4 threads paralelas.
+   - Cooldown e rate limit conforme documentação do GitHub.
+   - Rotação de tokens quando houver mais de 4 tokens.
+   - Escalonamento e rotação também em caso de erro 403/429.
+   - Uso de API REST, API GraphQL ou combinação das duas, escolhendo a alternativa mais eficiente para cada tipo de dado.
+
+8. Tipos de dados que o minerador deve conseguir produzir em JSON para posterior análise de grafo:
+   - issues_comments.json
+   - issues_closed.json
+   - pull_requests_comments.json
+   - pull_requests_opened.json
+   - pull_requests_reviews.json
+   - pull_requests_approvals.json
+   - pull_requests_merged.json
+   - possivelmente um arquivo consolidado de interações ponderadas para facilitar construção do grafo integrado.
+
+9. Observação técnica inferida do PDF:
+   - O PDF descreve as relações e métricas do trabalho, não impõe uma API específica. Portanto, é aceitável combinar REST e GraphQL para otimizar paginação, custo de consulta e disponibilidade dos eventos.
+
+10. Estratégia recomendada para implementação:
+   - REST para listagens paginadas de issues, pull requests, comentários e reviews, por ser direta e estável.
+   - GraphQL para consultas agregadas e redução de chamadas quando vantajoso.
+   - Persistir saídas em JSON bruto e/ou normalizado, uma por domínio de interação.
+   - Registrar metadados de mineração, janela temporal e progresso para continuidade e rastreabilidade.
+
+Itens do PDF não diretamente necessários nesta fase:
+- Implementação da estrutura de grafos e algoritmos de análise (etapas posteriores do trabalho).
+- Exportação para GEPHI e métricas analíticas, pois o pedido atual é focado no minerador e na coleta dos dados.
+
+Fim do resumo.
