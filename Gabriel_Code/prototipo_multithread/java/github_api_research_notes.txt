@@ -1,0 +1,32 @@
+Notas de Pesquisa: APIs do GitHub para Mineração em Massa
+
+1. REST vs GraphQL:
+   - REST API: Melhor para listagens simples e quando a paridade de recursos é necessária. No entanto, sofre com "over-fetching" (retorna mais dados do que o necessário) e requer múltiplas chamadas para obter detalhes de sub-recursos (ex: comentários de um PR específico).
+   - GraphQL API: Extremamente eficiente para obter dados profundamente aninhados em uma única chamada (ex: PRs com seus respectivos reviews, comentários e autores). Reduz drasticamente o número de requisições necessárias para reconstruir grafos de interação.
+   - Paridade: As APIs não têm paridade total. Algumas informações só estão disponíveis em uma delas. Para mineração de interações (reviews, merges, comments), o GraphQL é geralmente superior devido à flexibilidade de consulta.
+
+2. Limites de Taxa (Rate Limits):
+   - REST: 5.000 requisições por hora por token (autenticado).
+   - GraphQL: Limite baseado em "pontos" (complexidade da query). 5.000 pontos por hora por token.
+   - Cabeçalhos: X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset são essenciais para monitoramento em tempo real.
+   - Abuso: Além do limite por hora, existe o "Secondary Rate Limit" para evitar picos de tráfego. Recomenda-se um pequeno delay entre requisições paralelas.
+
+3. Estratégia de Rotação de Tokens:
+   - Com 1 a 24 tokens, a capacidade total escala linearmente (até 120.000 requisições/pontos por hora).
+   - A rotação deve ocorrer não apenas quando o limite é atingido, mas idealmente de forma round-robin para distribuir a carga e evitar gatilhos de detecção de abuso.
+   - Erros 403 (Forbidden) e 429 (Too Many Requests) devem disparar a troca imediata de token e um cooldown para o token afetado.
+
+4. Mineração de Dados para Grafos (PDF):
+   - Issues e Pull Requests: O GraphQL permite buscar a lista de PRs e, para cada um, trazer `reviews`, `comments` e o evento de `merge` em uma estrutura aninhada.
+   - Timeline Events: Úteis para capturar eventos específicos como "fechamento de issue por outro usuário".
+   - Filtro Temporal: Usar argumentos como `since` (REST) ou filtros de data em queries GraphQL para limitar a 3-5 anos atrás.
+
+5. Implementação Recomendada:
+   - Linguagem: Java (conforme solicitado).
+   - Bibliotecas: `HttpClient` nativo (Java 11+) para REST e requisições POST para GraphQL. `Jackson` para parsing de JSON.
+   - Concorrência: `ExecutorService` com pool fixo de 1-4 threads.
+   - Persistência: Streaming de JSON para arquivos para evitar consumo excessivo de memória em repositórios grandes.
+
+Próximos passos:
+- Definir as queries GraphQL específicas para cada item do PDF.
+- Estruturar as classes Java em ./Gama.
