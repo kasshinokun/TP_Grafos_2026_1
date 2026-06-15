@@ -10,7 +10,7 @@ import threading
 import time
 import logging
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../v1d')))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../')))
 
 from orchestrator_hibrido_alpha0b import EventBus, TokenManager, ShutdownManager
 
