@@ -111,16 +111,16 @@ if __name__ == "__main__":
     # }
 
     # 1. Carrega o JSON
-    # handler = QRCodeJSONHandler(json_file_path="data.json")
+    handler = QRCodeJSONHandler(json_file_path="data.json")
 
     # 2. Gera o QR Code
-    # caminho_imagem_gerada = handler.gerar_qr_code("meu_qrcode.png")
+    caminho_imagem_gerada = handler.gerar_qr_code("meu_qrcode.png")
 
     # 3. Lê o QR Code e recupera o dict
     dados_recuperados = handler.ler_qr_code(caminho_imagem_gerada)
 
     # 4. Salva de volta no arquivo
-    handler.write_json(dados_recuperados, "data.json")
+    # handler.write_json(dados_recuperados, "data.json")
 
     print("\n📦 Dados Recuperados do QR Code:")
     for chave in dados_recuperados:

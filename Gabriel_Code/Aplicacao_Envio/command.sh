@@ -50,7 +50,43 @@ pip install --upgrade pip
 pip install -r requirements.txt
 
 # roda o cifrador de tokens para qr code
-python3 cypher_token_rebuild.py
+"$PYTHON_SET" cypher_token_rebuild.py
 
-# inicia a aplicação do trabalho prático
-python3 orchestrator_hibrido_alpha0b.py
+# Configura o texto do prompt do menu
+PS3="Escolha uma opção (1-4): "
+
+# Definição das variáveis (sem espaços ao redor do '=')
+MODO_CONSOLE="Console TP"
+EXECUTE_CONSOLE="$PYTHON_SET orchestrator_hibrido_alpha0f.py"
+
+MODO_CTK="CTK GUI TP"
+EXECUTE_CTK="$PYTHON_SET gui_ctk.py"
+
+MODO_PYQT6="CTK PYQT6 TP"
+EXECUTE_PYQT6="$PYTHON_SET gui_pyqt6.py"
+
+# Lista de opções e ações
+select opcao in "$MODO_CONSOLE" "$MODO_CTK" "$MODO_PYQT6" "Sair"; do
+    case $REPLY in
+        1)
+            echo "Iniciando: $MODO_CONSOLE..."
+            $EXECUTE_CONSOLE
+            ;;
+        2)
+            echo "Iniciando: $MODO_CTK..."
+            $EXECUTE_CTK
+            ;;
+        3)
+            echo "Iniciando: $MODO_PYQT6..."
+            $EXECUTE_PYQT6
+            ;;
+        4)
+            echo "Saindo do programa. Até logo!"
+            break
+            ;;
+        *)
+            echo "Opção inválida! Escolha um número de 1 a 4."
+            ;;
+    esac
+done
+
