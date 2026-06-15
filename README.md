@@ -82,7 +82,7 @@ Cálculo de métricas:
 
 ## 💻 Tecnologias
 
-- **Linguagem**: [Java/Python] *(escolher uma)*
+- **Linguagem**: [Java/Python] *(Livre escolha)*
 - **Controle de Versão**: Git/GitHub
 - **Documentação**: LaTeX (template SBC)
 - **Visualização**: GEPHI
@@ -103,7 +103,7 @@ cd TP_Grafos_2026_1
 ```
 ### Compilação/Execução
 
-[Inserção de instruções específicas conforme a linguagem escolhida]
+[Inserção de instruções específicas conforme a linguagem escolhida] --> Em desenvolvimento.
 
 ### 🧪 Testes
 O projeto inclui testes unitários para:
@@ -112,7 +112,7 @@ Cobertura das funcionalidades da API de grafos
 Verificação de casos de uso e plano de aceitação
 ### 📊 Resultados
 
-[Seção para apresentar os resultados da análise do repositório escolhido]
+[Seção para apresentar os resultados da análise do repositório escolhido] --> Em desenvolvimento.
 
 ### 📄 Documentação
 Relatório Técnico: Disponível em LaTeX no diretório /docs
@@ -120,7 +120,9 @@ Apresentação: Slides e vídeo demonstrativo
 ### 🚀 Como Contribuir
 Este é um trabalho acadêmico. Contribuições externas não serão aceitas.
 ### 📝 Licença
-Projeto desenvolvido para fins acadêmicos. Ainda em análise.
+Projetos desenvolvidos para fins acadêmicos. 
+[GNU General Public License v3.0](https://github.com/kasshinokun/TP_Grafos_2026_1/blob/main/LICENSE.md)
+
 ### 🙏 Agradecimentos
 - PUC Minas - Pontifícia Universidade Católica de Minas Gerais
 - Prof. Leonardo Vilela Cardoso

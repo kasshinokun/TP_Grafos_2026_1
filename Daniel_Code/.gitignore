@@ -1,0 +1,9 @@
+# Ignorar credenciais e chaves
+data.json
+
+# Ignorar o QR Code (já que ele contém a chave criptografada)
+token_qr.png
+
+# Ignorar a pasta de dados pesados e temporários
+data/
+__pycache__/
