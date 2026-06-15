@@ -1,1 +1,91 @@
-%Documentação segundo Paulo
+%Documentação segu# Documentação Técnica de Engenharia — Projeto Delta v4c (v1d)
+
+Este documento descreve a arquitetura, as decisões de projeto, a modelagem matemática e os planos de validação da ferramenta computacional desenvolvida para o processamento e análise de grafos de colaboração em repositórios de código aberto (Alvo: `vuejs/core`).
+
+---
+
+## 1. Visão Geral da Arquitetura do Sistema
+O ecossistema foi completamente unificado em Python, migrado a partir de um protótipo inicial em Java. O sistema adota a Arquitetura Orientada a Eventos (EDA) de forma assíncrona, desacoplando o pipeline de extração de dados (ETL), o motor matemático de tratamento de grafos e a camada de visualização em interface gráfica.
+
+### Árvore Estrutural de Módulos (v1d)
+* `abstract_graph.py`: Contrato base abstrato (`AbstractGraph`) e definições de enums de representação.
+* `graphs.py`: Classes concretas de persistência e adjacência (`AdjacencyListGraph` e `AdjacencyMatrixGraph`).
+* `orchestrator_hibrido_alpha0e.py`: Motor multithread de mineração, paginação e controle de rate-limits da API do GitHub.
+* `gui_ctk.py`: Interface Gráfica de Usuário interativa desenvolvida sobre a biblioteca `CustomTkinter`.
+* `data.json` / `meu_qrcode.png`: Componentes de carga de credenciais e tokens de acesso de forma criptografada.
+
+---
+
+## 2. Motor de Grafos e Otimização Teórica
+
+### Classe Abstrata e API Obrigatória
+A infraestrutura herda estritamente de `AbstractGraph`. Para cumprir as restrições de desempenho exigidas, a classe concreta `AdjacencyListGraph` substitui o encadeamento dinâmico comum por um arranjo indexado composto por dicionários nativos (`List[Dict[int, float]]`).
+
+* **Complexidade Temporal:** A verificação de existência de arcos (`has_edge`) e a recuperação de pesos de arestas (`get_edge_weight`) ocorrem em tempo constante $O(1)$.
+* **Restrições Estruturais:** O grafo é estritamente simples e direcionado. Não são permitidos laços (a diagonal principal é validada e zerada) nem arestas múltiplas. A inserção via `add_edge` é puramente idempotente.
+
+### Calibração de Pesos Integrados
+As conexões direcionadas ($u \rightarrow v$) possuem pesos que refletem a intensidade da colaboração técnica no ecossistema:
+* **Comentário em Discussão (Issue / PR):** Peso 2.0
+* **Abertura de Issue comentada por terceiros:** Peso 3.0
+* **Revisão Formal ou Aprovação de Código:** Peso 4.0
+* **Ato de Efetuar o Merge de um Pull Request:** Peso 5.0
+
+---
+
+## 3. Pipeline de Mineração e Resiliência Concorrente (EDA)
+
+### Separação de Canais por Tripla Fila
+Para mitigar condições de corrida (*race conditions*) detectadas em versões anteriores, onde workers e o loop de controle disputavam a mesma fila, o barramento `EventBus` foi refatorado utilizando três estruturas de `queue.Queue` isoladas e thread-safe:
+
+1.  **`task_queue`**: Gerencia de forma concorrente a fila de páginas pendentes a serem mineradas pelo pool de threads.
+2.  **`data_queue`**: Canal exclusivo de alta vazão para transporte de payloads de dados (`DATA_EXTRACTED`) consumidos pelo armazenador em disco.
+3.  **`notification_queue`**: Linha prioritária de mensagens de infraestrutura (como alertas de `TOKEN_COOLDOWN`).
+
+### Gerenciamento Multi-Token e Cooldown Global
+O `Orchestrator` distribui as requisições HTTP síncronas entre 4 workers paralelos alimentados por um `ThreadPoolExecutor`. 
+* Ao interceptar uma restrição de tráfego (HTTP 403 / 429), o `TokenManager` isola o token e calcula o tempo de liberação.
+* O laço supervisor monitora a função `all_in_cooldown()`. Caso todas as chaves atinjam o teto limite, o sistema invoca `get_next\_reset\_time()` e suspende a execução de forma segura, disparando avisos na interface e impedindo o travamento do software.
+
+---
+
+## 4. Modelagem Matemática de Métricas Implementadas
+
+O sistema processa a topologia da rede aplicando algoritmos estruturais nativos:
+
+* **Centralidade de Grau ($C_D$):** Mapeia o volume de conexões diretas de entrada e saída de cada ator.
+    $$C_D^{in}(u) = \sum_{v \in V} A_{vu}, \quad C_D^{out}(u) = \sum_{v \in V} A_{uv}$$
+* **Centralidade de Intermediação ($C_B$):** Identifica colaboradores que atuam como pontes e elos de articulação entre subgrupos.
+    $$C_B(u) = \sum_{s \neq u \neq t} \frac{\sigma_{st}(u)}{\sigma_{st}}$$
+* **Centralidade de Proximidade ($C_C$):** Mede a velocidade de acesso à informação com base no inverso das distâncias mínimas (BFS).
+    $$C_C(u) = \frac{|V| - 1}{\sum_{v \neq u} d(u, v)}$$
+* **PageRank ($PR$):** Determina recursivamente a influência de um desenvolvedor ponderando a importância de seus vizinhos.
+    $$PR(u) = \frac{1-d}{|V|} + d \sum_{v \in B_u} \frac{PR(v)}{C_D^{out}(v)}$$
+* **Densidade da Rede ($\rho$):** Proporção de acoplamento técnico global da comunidade.
+    $$\rho = \frac{|E|}{|V|(|V| - 1)}$$
+
+---
+
+## 5. Arquitetura Concorrente da Interface Gráfica (GUI)
+
+Para evitar o congelamento da interface visual (`Main UI Thread`) durante a execução do pipeline de dados, o arquivo `gui_ctk.py` implementa um modelo assíncrono baseado em *Threading* e *Polling*:
+
+* **UI Thread:** Executa de forma isolada o método `mainloop()` do CustomTkinter, garantindo renderização contínua a 60Hz.
+* **Worker Thread:** O acionamento da mineração instancia uma thread em segundo plano (`GUI-MiningWorker`), liberando a janela para interações do usuário.
+* **Mecanismo de Polling:** Através do agendador `self.after()`, o método `_poll_queues()` inspeciona a fila `log_queue` a cada 120ms, drenando os registros e capturando eventos de sistema de forma thread-safe sem travar a renderização.
+
+---
+
+## 6. Plano de Validação e Testes Automatizados
+
+Para homologação das restrições de integridade da API, implementou-se uma suíte de testes unitários automatizados baseados no pacote `unittest`.
+
+### Casos de Teste Cobertos
+* `test_idempotency_add_edge`: Garante que tentativas de reinserção de uma aresta existente não gerem duplicidade nem alterem o contador `edge_count`.
+* `test_loop_restriction`: Valida se o sistema lança corretamente uma exceção do tipo `ValueError` ao tentar conectar um vértice a ele mesmo.
+* `test_index_out_of_bounds`: Certifica o disparo de um erro do tipo `IndexError` caso arcos façam referência a IDs fora dos limites estabelecidos do grafo.
+
+### Como Executar os Testes Unitários
+A partir da raiz do projeto no terminal, execute:
+```bash
+python -m unittest -v graphs.pyndo Paulo
