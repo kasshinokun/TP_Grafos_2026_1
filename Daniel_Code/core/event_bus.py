@@ -1,8 +1,10 @@
-# core/event_bus.py
 from collections import defaultdict
 
 class EventBus:
-
+    """
+    Sistema de Pub/Sub usando apenas Python nativo, sem PyQt6.
+    Garante que todas as micro-aplicações conversem na mesma instância (Singleton).
+    """
     _instance = None
 
     def __new__(cls):
@@ -12,11 +14,9 @@ class EventBus:
         return cls._instance
 
     def subscribe(self, event_type, callback):
-        """Registra uma função (callback) para escutar um evento específico."""
         self.subscribers[event_type].append(callback)
 
     def publish(self, event_type, payload=None):
-        """Dispara um evento, chamando todas as funções registradas para ele."""
         if payload is None:
             payload = {}
         print(f"[EventBus] Evento publicado: {event_type}")
