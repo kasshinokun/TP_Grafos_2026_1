@@ -2,7 +2,7 @@
 
 ## 📋 Descrição
 
-Projeto desenvolvido para a disciplina de **Teoria de Grafos e Computabilidade** do curso de Engenharia de Software da Pontifícia Universidade Católica de Minas Gerais (PUC Minas).
+Projeto desenvolvido para a disciplina de **Teoria de Grafos e Computabilidade** do curso de Engenharia de Computação da Pontifícia Universidade Católica de Minas Gerais (PUC Minas).
 
 Este trabalho consiste no desenvolvimento de uma ferramenta computacional que processa dados estruturados como grafos, aplicando conceitos da teoria dos grafos e boas práticas de engenharia de software para análise das interações entre colaboradores em repositórios GitHub.
 
