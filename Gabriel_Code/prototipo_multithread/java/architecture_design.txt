@@ -1,0 +1,79 @@
+Arquitetura do Minerador Gama
+
+1. Estrutura de Diretórios:
+   ./Gama/
+   ├── src/
+   │   ├── api/
+   │   │   ├── GitHubMiner.java (Main)
+   │   │   ├── TokenManager.java (Rotação e Rate Limit)
+   │   │   ├── MiningWorker.java (Thread de execução)
+   │   │   ├── ConfigLoader.java (Leitura de tokens.json)
+   │   │   └── DataWriter.java (Persistência em JSON)
+   │   └── model/ (Classes POJO para Jackson, se necessário)
+   ├── tokens.json (Configuração de entrada)
+   └── output/ (Diretório para os arquivos .json gerados)
+
+2. Estratégia de Coleta:
+   - GraphQL será a interface principal para coletar Issues e Pull Requests com seus respectivos eventos aninhados, pois reduz o número de chamadas e o custo de rate limit.
+   - REST será usado como fallback ou para eventos de timeline específicos se o GraphQL não cobrir algum detalhe de "fechamento de issue por terceiro" de forma eficiente.
+
+3. Queries GraphQL Planejadas:
+
+   A. Query para Issues:
+   Busca issues com autores, comentários (autor e data) e eventos de fechamento (quem fechou e quando).
+   ```graphql
+   query($owner: String!, $name: String!, $cursor: String) {
+     repository(owner: $owner, name: $name) {
+       issues(first: 50, after: $cursor, orderBy: {field: CREATED_AT, direction: DESC}) {
+         pageInfo { hasNextPage, endCursor }
+         nodes {
+           number, author { login }, createdAt
+           comments(first: 100) {
+             nodes { author { login }, createdAt }
+           }
+           timelineItems(first: 50, itemTypes: [CLOSED_EVENT]) {
+             nodes {
+               ... on ClosedEvent { actor { login }, createdAt }
+             }
+           }
+         }
+       }
+     }
+   }
+   ```
+
+   B. Query para Pull Requests:
+   Busca PRs com autores, revisões (autor, estado, data), comentários de revisão e eventos de merge.
+   ```graphql
+   query($owner: String!, $name: String!, $cursor: String) {
+     repository(owner: $owner, name: $name) {
+       pullRequests(first: 50, after: $cursor, orderBy: {field: CREATED_AT, direction: DESC}) {
+         pageInfo { hasNextPage, endCursor }
+         nodes {
+           number, author { login }, createdAt, merged, mergedAt, mergedBy { login }
+           reviews(first: 50) {
+             nodes { author { login }, state, createdAt }
+           }
+           comments(first: 100) {
+             nodes { author { login }, createdAt }
+           }
+         }
+       }
+     }
+   }
+   ```
+
+4. Lógica de Rotação de Tokens:
+   - Classe `TokenManager` mantém uma `Queue` de tokens.
+   - Cada thread solicita um token ao `TokenManager` antes de cada requisição.
+   - Se uma requisição falha com 403/429, o token é marcado com um `cooldown_until` e movido para o fim da fila.
+   - O `TokenManager` fornece o próximo token disponível que não esteja em cooldown.
+
+5. Arquivos de Saída:
+   - `issues_data.json`: Contém o dump de issues, comentários e eventos de fechamento.
+   - `pull_requests_data.json`: Contém o dump de PRs, revisões, comentários e merges.
+   - O minerador filtrará as datas conforme a janela de 3-5 anos solicitada.
+
+6. Concorrência:
+   - `ExecutorService` com pool de tamanho dinâmico (1-4).
+   - Uso de `BlockingQueue` para gerenciar as páginas a serem mineradas se necessário, ou uma abordagem sequencial paginada por tipo de recurso.
