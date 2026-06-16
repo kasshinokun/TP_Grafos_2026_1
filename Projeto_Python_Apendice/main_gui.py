@@ -228,7 +228,7 @@ class GraphUltimateGUI:
         lbl = ttk.Label(self.root, text="Terminal de Saída Unificado (Logs do Sistema):")
         lbl.pack(anchor="w", padx=15)
         
-        self.txt_console = scrolledtext.ScrolledText(self.root, height=12, bg="#1a1a1a", fg="#ffffff", font=('Consolas', 10))
+        self.txt_console = scrolledtext.ScrolledText(self.root, height=25, bg="#1a1a1a", fg="#ffffff", font=('Consolas', 10))
         self.txt_console.pack(fill="x", expand=False, padx=10, pady=5)
         self.txt_console.insert(tk.END, "=== Sistema de Grafos Pronto ===\nDigite parâmetros nas abas e clique nos comandos correspondentes.\n")
 
