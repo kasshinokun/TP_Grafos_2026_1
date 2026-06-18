@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gexf xmlns="http://gexf.net/1.3" version="1.3">
+  <graph defaultedgetype="directed">
+    <nodes>
+      <node id="0" label="typescript-bot" weight="1.0000"/>
+      <node id="1" label="mcube-12139" weight="1.0000"/>
+      <node id="2" label="RyanCavanaugh" weight="1.0000"/>
+      <node id="3" label="matthiasrieger" weight="1.0000"/>
+      <node id="4" label="ahejlsberg" weight="1.0000"/>
+      <node id="5" label="robpalme" weight="1.0000"/>
+      <node id="6" label="Lefgk" weight="1.0000"/>
+      <node id="7" label="hkleungai" weight="1.0000"/>
+      <node id="8" label="kadun13nindi12" weight="1.0000"/>
+      <node id="9" label="angrybacon" weight="1.0000"/>
+      <node id="10" label="eng-same" weight="1.0000"/>
+      <node id="11" label="RHOOPH" weight="1.0000"/>
+      <node id="12" label="svenvandescheur" weight="1.0000"/>
+      <node id="13" label="raydog" weight="1.0000"/>
+      <node id="14" label="Se3do" weight="1.0000"/>
+      <node id="15" label="adevart" weight="1.0000"/>
+      <node id="16" label="sulthonzh" weight="1.0000"/>
+      <node id="17" label="Bertie690" weight="1.0000"/>
+      <node id="18" label="atomeam" weight="1.0000"/>
+      <node id="19" label="paoloricciuti" weight="1.0000"/>
+      <node id="20" label="typescript-automation[bot]" weight="1.0000"/>
+      <node id="21" label="TheLazySquid" weight="1.0000"/>
+      <node id="22" label="youngspe" weight="1.0000"/>
+      <node id="23" label="danon" weight="1.0000"/>
+      <node id="24" label="ArshVermaGit" weight="1.0000"/>
+    </nodes>
+    <edges>
+      <edge id="0" source="0" target="1" weight="1.0000"/>
+      <edge id="1" source="0" target="7" weight="1.0000"/>
+      <edge id="2" source="0" target="10" weight="1.0000"/>
+      <edge id="3" source="0" target="11" weight="1.0000"/>
+      <edge id="4" source="0" target="12" weight="1.0000"/>
+      <edge id="5" source="0" target="13" weight="1.0000"/>
+      <edge id="6" source="0" target="19" weight="1.0000"/>
+      <edge id="7" source="0" target="23" weight="1.0000"/>
+      <edge id="8" source="2" target="3" weight="1.0000"/>
+      <edge id="9" source="2" target="6" weight="1.0000"/>
+      <edge id="10" source="2" target="8" weight="1.0000"/>
+      <edge id="11" source="2" target="9" weight="1.0000"/>
+      <edge id="12" source="2" target="14" weight="1.0000"/>
+      <edge id="13" source="2" target="15" weight="1.0000"/>
+      <edge id="14" source="2" target="16" weight="1.0000"/>
+      <edge id="15" source="2" target="17" weight="1.0000"/>
+      <edge id="16" source="2" target="18" weight="1.0000"/>
+      <edge id="17" source="2" target="22" weight="1.0000"/>
+      <edge id="18" source="2" target="24" weight="1.0000"/>
+      <edge id="19" source="4" target="5" weight="1.0000"/>
+      <edge id="20" source="20" target="21" weight="1.0000"/>
+    </edges>
+  </graph>
+</gexf>
