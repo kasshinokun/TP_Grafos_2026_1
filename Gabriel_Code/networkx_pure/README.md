@@ -262,4 +262,4 @@ A suíte cobre: protocolo do `GraphAdapter`, caminhamentos, conectividade, árvo
 
 ## Licença
 
-Este módulo faz parte do projeto de TCC e segue a mesma licença do repositório principal.
+Este módulo faz parte do projeto de TP de Grafos e segue a mesma licença [GNU LICENSE v3](https://github.com/kasshinokun/TP_Grafos_2026_1/blob/main/LICENSE.md).
