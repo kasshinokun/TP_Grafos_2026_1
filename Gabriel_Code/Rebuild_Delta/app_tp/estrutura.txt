@@ -1,0 +1,79 @@
+```
+rebuild_gama_v2b_update_f1/
+├── CHANGELOG.md                      # Histórico de mudanças do projeto
+├── app.py                            # Ponto de entrada principal da aplicação
+├── app_teste.py                      # Aplicação de teste em console separada que consome a API
+├── csv/                              # Pasta para arquivos .csv
+│   └── interacoes_reais.csv          # Exemplo de arquivo de dados em .csv
+├── csv-provisorio/                   # Pasta para arquivos .csv provisórios
+│   └── microsoft_TypeScript_20260620_111912.csv # Exemplo de arquivo provisório
+├── estrutura.txt                     # Este arquivo de estrutura do projeto
+├── filemanager.py                    # Módulo para gerenciamento de arquivos
+├── gexf/                             # Pasta para arquivos .gexf
+│   └── graph1.gexf                   # Exemplo de arquivo de dados em .gexf
+├── grafo/                            # Módulo principal para operações de grafo
+│   ├── __init__.py
+│   ├── graph/                        # Núcleo da estrutura de dados (Exigência do PDF)
+│   │   ├── __init__.py
+│   │   ├── abstract_graph.py         # API Abstrata Obrigatória
+│   │   ├── adjacency_list_graph.py   # Implementação Otimizada (O(1) em graus)
+│   │   └── adjacency_matrix_graph.py # Implementação de grafo por matriz de adjacência
+│   ├── networkx_pure/                # Algoritmos puros (Sem NetworkX)
+│   │   ├── __init__.py
+│   │   ├── adapter.py                # Ponte com Duck-Typing (Otimização de Performance)
+│   │   ├── centrality.py             # Métricas de centralidade (Degree, Betweenness, Closeness, PageRank)
+│   │   ├── communities.py            # Algoritmos de detecção de comunidades (Label Propagation, Modularidade, Bridging Ties)
+│   │   └── structure.py              # Métricas estruturais (Densidade, Clustering, Assortatividade)
+│   └── utils/                        # Utilitários para o módulo de grafo
+│       ├── __init__.py
+│       └── gexf_parser.py            # Parser nativo XML para GEXF
+├── gui/                              # GUI responsiva
+│   ├── __init__.py
+│   ├── frames/                       # Telas/frames da interface gráfica
+│   │   ├── api_primitiva.py          # Preparação para rodar os algoritmos padrão
+│   │   ├── empty_frames.py           # Placebo para as telas a serem implementadas - visão inicial
+│   │   ├── gerenciar_grafos.py       # Gestão de grafos a partir do .csv para runtime ou ./gexf/<nome grafo>.gexf
+│   │   ├── pure_networkx_gui.py      # Testes unitários em GUI PureNetworkX - Demonstração
+│   │   ├── seek_n_path.py            # Algoritmos de busca, caminhos, fluxo, planaridade e coloração
+│   │   └── testes_unitarios.py       # Testes unitários em GUI padrão
+│   ├── graph_canvas.py               # Canvas para visualização de grafos force-directed
+│   ├── main_window.py                # Janela principal da aplicação GUI
+│   ├── metrics_panel.py              # Painel para exibição de métricas
+│   ├── miner_control.py              # Controle do minerador na GUI
+│   ├── screen_about.py               # Tela 'Sobre' da aplicação
+│   ├── screen_base.py                # Classe base para as telas da GUI
+│   ├── screen_graph.py               # Tela de visualização de grafos
+│   ├── screen_home.py                # Tela inicial da aplicação
+│   ├── screen_manager.py             # Gerenciador de telas da GUI
+│   ├── screen_metrics.py             # Tela de exibição de métricas
+│   ├── screen_miner.py               # Tela de controle do minerador
+│   ├── screen_settings.py            # Tela de configurações
+│   └── workers.py                    # Threads de worker para tarefas em segundo plano
+├── miner/                            # Minerador melhorado
+│   ├── __init__.py
+│   ├── base_miner.py                 # Classe base para mineradores
+│   ├── checkpoint.py                 # Funcionalidade de checkpointing
+│   ├── common_miner.py               # Minerador comum
+│   ├── hybrid_miner.py               # Minerador híbrido
+│   ├── qr_handler.py                 # Manipulador de QR codes
+|   ├── scrap_graphql_miner.py        # Classe base para coleta de status com API GraphQL do GitHub
+│   └── rate_limiter.py               # Funcionalidade de rate limiting
+├── prompt.txt                        # Arquivo de prompt/instruções
+├── qr_tokens/                        # Pasta para tokens QR
+│   └── meu_qrcode.png                # Exemplo de arquivo de QR code
+├── tests/                            # Suíte completa de testes
+|   ├── __init__.py
+|   ├── fixtures/                     # Dados de teste e resultados esperados
+│   │   ├── __init__.py
+│   │   ├── expected_results.py       # Resultados esperados para testes
+│   │   └── synthetic_graphs.py       # Grafos sintéticos para testes
+|   ├── test_algorithms.py            # Testes para algoritmos de grafo
+|   ├── test_graph_api.py             # Testes para a API de grafo
+|   ├── test_graphql_api.py           # Testes para a API GraphQL do GitHub - implementado, não testado ainda
+|   ├── test_metrics.py               # Testes para as 11 métricas
+│   └── test_miner.py                 # Testes para o módulo minerador
+└── viz/                              # Módulo de visualização
+    ├── __init__.py
+    ├── force_directed.py             # Layout Fruchterman-Reingold para visualização
+    └── renderer.py                   # Renderizador de visualizações
+```

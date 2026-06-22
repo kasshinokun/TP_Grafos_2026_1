@@ -1,0 +1,429 @@
+classDiagram
+    direction TB
+
+    %% ============================================================
+    %% CAMADA grafo/graph — API obrigatória (estruturas de dados)
+    %% ============================================================
+    class RepType {
+        <<enumeration>>
+        ADJACENCY_LIST
+        ADJACENCY_MATRIX
+    }
+
+    class AbstractGraph {
+        <<abstract>>
+        +int num_vertices
+        +RepType rep_type
+        +check_vertex(u) void
+        +check_edge(u, v) void
+        +get_vertex_count() int
+        +get_edge_count() int
+        +has_edge(u, v) bool
+        +add_edge(u, v) void
+        +remove_edge(u, v) void
+        +is_sucessor(u, v) bool
+        +is_predessor(u, v) bool
+        +is_divergent(u1, v1, u2, v2) bool
+        +is_convergent(u1, v1, u2, v2) bool
+        +is_incident(u, v, x) bool
+        +get_vertex_in_degree(u) int
+        +get_vertex_out_degree(u) int
+        +set_vertex_weight(v, w) void
+        +get_vertex_weight(v) float
+        +set_edge_weight(u, v, w) void
+        +get_edge_weight(u, v) float
+        +is_connected() bool
+        +is_empty_graph() bool
+        +is_complete_graph() bool
+        +export_to_gephi(path) void
+    }
+
+    class AdjacencyListGraph {
+        -dict adj
+        -dict rev_adj
+        +get_successors(u) Set~int~
+        +get_predecessors(u) Set~int~
+    }
+
+    class AdjacencyMatrixGraph {
+        -list matrix
+        +get_matrix() list
+        +to_matrix_string() str
+        +get_successors(u) Set~int~
+        +get_predecessors(u) Set~int~
+    }
+
+    class UndirectedGraph {
+        -AbstractGraph subjacente
+        +get_subjacente(grafo_direcionado) void
+        +from_subjacente() AbstractGraph
+        +has_subjacente() bool
+        +get_successors(u) Set~int~
+        +get_predecessors(u) Set~int~
+    }
+
+    AbstractGraph <|-- AdjacencyListGraph
+    AbstractGraph <|-- AdjacencyMatrixGraph
+    AbstractGraph <|-- UndirectedGraph
+    AbstractGraph o-- RepType
+
+    %% ============================================================
+    %% CAMADA grafo/networkx_pure — algoritmos estilo NetworkX
+    %% ============================================================
+    class GraphAdapter {
+        -AbstractGraph _g
+        +number_of_nodes() int
+        +number_of_edges() int
+        +nodes() list~int~
+        +successors(u) list~int~
+        +predecessors(v) list~int~
+        +neighbors(u) list~int~
+        +in_degree(u) int
+        +out_degree(u) int
+        +edges() list~tuple~
+    }
+
+    class TraversalResult {
+        +list~int~ order
+        +dict predecessor
+        +path_to(target) list~int~
+    }
+
+    class transversal_module["transversal (módulo de funções)"] {
+        <<module>>
+        +bfs(graph, source) TraversalResult
+        +dfs(graph, source) TraversalResult
+        +dfs_forest(graph) list~TraversalResult~
+        +connected_components(graph) list
+        +kosaraju_scc(graph) list
+        +tarjan_scc(graph) list
+        +kruskal(graph) AdjacencyListGraph
+        +prim(graph, start) AdjacencyListGraph
+        +dijkstra(graph, source) tuple
+        +bellman_ford(graph, source) tuple
+        +floyd_warshall(graph) tuple
+        +ford_fulkerson(graph, source, sink) tuple
+        +edmonds_karp(graph, source, sink) tuple
+        +topological_sort(graph) list
+        +has_cycle_directed(graph) bool
+        +has_cycle_undirected(graph) bool
+        +is_bipartite(graph) tuple
+    }
+
+    class structure_module["structure (módulo de funções)"] {
+        <<module>>
+        +density(adapter) float
+        +clustering_coefficient(adapter) dict
+        +average_clustering(adapter) float
+        +assortativity(adapter) float
+        +isolated_vertices(adapter) list
+        +source_vertices(adapter) list
+        +sink_vertices(adapter) list
+        +is_regular(adapter) bool
+        +degree_extremes(adapter) tuple
+        +classify_topology(adapter) str
+        +structural_summary(adapter) dict
+    }
+
+    class centrality_module["centrality (módulo de funções)"] {
+        <<module>>
+        +degree_centrality(adapter) dict
+        +closeness_centrality(adapter) dict
+        +betweenness_centrality(adapter) dict
+        +pagerank(adapter, damping, max_iter, tol) dict
+    }
+
+    class communities_module["communities (módulo de funções)"] {
+        <<module>>
+        +label_propagation_communities(adapter) list
+        +modularity(adapter, communities) float
+        +bridging_ties(adapter) list
+    }
+
+    GraphAdapter --> AbstractGraph : envolve
+    transversal_module ..> AbstractGraph : opera sobre
+    transversal_module ..> AdjacencyListGraph : retorna (MST/fluxo)
+    transversal_module --> TraversalResult : cria
+    structure_module ..> GraphAdapter : opera sobre
+    centrality_module ..> GraphAdapter : opera sobre
+    communities_module ..> GraphAdapter : opera sobre
+
+    %% ============================================================
+    %% CAMADA grafo/utils — I/O e inspeção estrutural
+    %% ============================================================
+    class gexf_parser_module["gexf_parser (módulo de funções)"] {
+        <<module>>
+        +load_gexf(filepath, force_type) AbstractGraph
+    }
+
+    class graph_structure_module["graph_structure (módulo de funções)"] {
+        <<module>>
+        +adjacency_matrix(graph) list
+        +adjacency_list(graph) dict
+        +degree_sequence(graph) list
+        +format_adjacency_matrix(graph, max_vertices) str
+        +format_adjacency_list(graph, max_vertices) str
+        +format_degree_sequence(graph, max_vertices) str
+    }
+
+    gexf_parser_module ..> AbstractGraph : constrói
+    gexf_parser_module ..> UndirectedGraph : constrói (se não direcionado)
+    graph_structure_module ..> AbstractGraph : opera sobre
+
+    %% ============================================================
+    %% CAMADA event — Arquitetura Orientada a Eventos (EDA)
+    %% ============================================================
+    class EventType {
+        <<enumeration>>
+        LOAD_GRAPH
+        SAVE_GRAPH
+        BUILD_GRAPH_FROM_CSV
+        RUN_BFS
+        RUN_DFS
+        RUN_DIJKSTRA
+        RUN_KRUSKAL
+        RUN_FORD_FULKERSON
+        SHOW_STRUCTURE
+        RUN_TESTS
+        HELP
+        ECHO
+        +from_value(value) EventType
+    }
+
+    class Event {
+        <<frozen dataclass>>
+        +EventType event_type
+        +dict payload
+        +str event_id
+        +float created_at
+        +str source
+        +get(key, default) Any
+        +require(key) Any
+    }
+
+    class EventResult {
+        +str event_id
+        +EventType event_type
+        +bool success
+        +Any data
+        +str error
+        +float duration_seconds
+        +str handled_in_thread
+        +ok(event, data, duration) EventResult
+        +fail(event, error, duration) EventResult
+    }
+
+    class EventBus {
+        -dict~EventType,list~ _subscriptions
+        -Queue _result_queue
+        -Lock _lock
+        +subscribe(event_type, handler, default_async) void
+        +unsubscribe(event_type, handler) bool
+        +has_subscribers(event_type) bool
+        +dispatch(event, async_) list~EventResult~
+        -_dispatch_sync(event, handler) EventResult
+        -_dispatch_async(event, handler) Thread
+        +pop_results() list~EventResult~
+    }
+
+    class EventOrchestrator {
+        +EventBus bus
+        +AbstractGraph current_graph
+        +str current_graph_name
+        +str gexf_dir
+        +str csv_dir
+        +dispatch(event_type, payload, source, async_) list~EventResult~
+        +poll() list~EventResult~
+        -_register_default_handlers() void
+        -_handle_load_graph(event) dict
+        -_handle_bfs(event) dict
+        -_handle_show_structure(event) dict
+        -_handle_run_tests(event) dict
+    }
+
+    EventBus o-- Event : recebe
+    EventBus --> EventResult : produz
+    EventBus o-- "0..*" EventType : agrupa por
+    EventOrchestrator *-- EventBus
+    EventOrchestrator --> AbstractGraph : mantém estado
+    EventOrchestrator ..> transversal_module : religa
+    EventOrchestrator ..> gexf_parser_module : religa
+    EventOrchestrator ..> graph_structure_module : religa
+
+    %% ============================================================
+    %% CAMADA cli — interpretador de comandos sobre a EDA
+    %% ============================================================
+    class ParsedCommand {
+        <<dataclass>>
+        +str raw_text
+        +str command_token
+        +dict kwargs
+    }
+
+    class CliInterpreter {
+        +parse(raw_text) ParsedCommand
+    }
+
+    class CommandSpec {
+        <<frozen dataclass>>
+        +FrozenSet required
+        +FrozenSet optional
+        +allowed() FrozenSet
+    }
+
+    class ValidatedCommand {
+        <<dataclass>>
+        +EventType event_type
+        +dict payload
+        +str raw_text
+    }
+
+    class CliCmdValidator {
+        +validate(parsed) ValidatedCommand
+        -_resolve_event_type(token) EventType
+    }
+
+    class CommandRequest {
+        <<dataclass>>
+        +str request_id
+        +ValidatedCommand validated
+        +str source
+    }
+
+    class CliRequester {
+        +EventOrchestrator orchestrator
+        +build_request(validated, source) CommandRequest
+        +send(request, async_) list~EventResult~
+    }
+
+    class cli_responser_module["cli_responser (módulo de funções)"] {
+        <<module>>
+        +format_result(result) str
+        +format_results(results) str
+        +format_pending_notice(event_type_value) str
+    }
+
+    class CliOrchestrator {
+        +EventOrchestrator event_orchestrator
+        +CliInterpreter interpreter
+        +CliCmdValidator validator
+        +CliRequester requester
+        +execute(raw_text, source) str
+        +poll_async_results() str
+        +help_text() str
+    }
+
+    CliInterpreter --> ParsedCommand : produz
+    CliCmdValidator --> ValidatedCommand : produz
+    CliCmdValidator --> CommandSpec : usa
+    CliCmdValidator ..> ParsedCommand : valida
+    CliRequester --> CommandRequest : produz
+    CliRequester --> EventOrchestrator : despacha em
+    CliOrchestrator *-- CliInterpreter
+    CliOrchestrator *-- CliCmdValidator
+    CliOrchestrator *-- CliRequester
+    CliOrchestrator *-- EventOrchestrator
+    CliOrchestrator ..> cli_responser_module : usa
+
+    %% ============================================================
+    %% CAMADA gui/bridges — bridge da suíte de testes p/ a GUI
+    %% ============================================================
+    class TestCategory {
+        <<frozen dataclass>>
+        +str key
+        +str label
+        +str module_path
+        +bool uses_pytest
+    }
+
+    class RunReport {
+        <<dataclass>>
+        +str label
+        +int total
+        +int passed
+        +int failed
+        +int errors
+        +int skipped
+        +float duration_seconds
+        +str raw_output
+        +list case_results
+        +str unavailable_reason
+        +success() bool
+    }
+
+    class TestOrchestrator {
+        -dict _class_cache
+        +list_categories() list~TestCategory~
+        +get_category(key) TestCategory
+        +list_runs(category_key) list~str~
+        +list_test_methods(category_key, run_label) list~str~
+        +run(category_key, run_label) RunReport
+        -_discover_classes(category) dict
+        -_run_unittest(category, run_label) RunReport
+        -_run_pytest(category) RunReport
+    }
+
+    TestOrchestrator --> TestCategory : organiza
+    TestOrchestrator --> RunReport : produz
+    EventOrchestrator ..> TestOrchestrator : religa (RUN_TESTS)
+
+    %% ============================================================
+    %% CAMADA miner — mineração GitHub e construção de grafos
+    %% ============================================================
+    class BaseMiner {
+        <<abstract>>
+        +str repo_owner
+        +str repo_name
+        +run() AdjacencyListGraph
+        +cancel() void
+        +get_stats() dict
+        -_fetch_issues() list
+        -_fetch_pull_requests() list
+        -_build_graph_from_interactions(interactions) AdjacencyListGraph
+    }
+
+    class HybridMiner {
+        +list tokens
+        +run_with_checkpoint(checkpoint_interval) AdjacencyListGraph
+        -_fetch_interactions(already_processed) list
+        -_build_graph(interactions) AdjacencyListGraph
+    }
+
+    class GitHubRateLimiter {
+        -list~str~ tokens
+        +get_token() str
+        +get_remaining_quota() dict
+    }
+
+    class graph_builder_module["graph_builder (módulo de funções)"] {
+        <<module>>
+        +load_interactions_csv(path) list~dict~
+        +build_all_graphs(interactions) dict~str,AdjacencyListGraph~
+    }
+
+    BaseMiner <|-- HybridMiner
+    HybridMiner --> GitHubRateLimiter : usa
+    HybridMiner --> AdjacencyListGraph : produz
+    graph_builder_module --> AdjacencyListGraph : produz (4 grafos)
+    EventOrchestrator ..> graph_builder_module : religa (BUILD_GRAPH_FROM_CSV)
+
+    %% ============================================================
+    %% CAMADA gui/frames — telas que consomem as camadas acima
+    %% ============================================================
+    class PrimitiveAPIFrame["PrimitiveAPIFrame (api_primitiva.py)"] {
+        +AbstractGraph current_graph
+        +CliOrchestrator cli
+        -_on_cli_submit() void
+        -_sync_graph_from_cli() void
+        -_on_show_structure_click() void
+    }
+
+    class UnitTestFrame["UnitTestFrame (testes_unitarios.py)"] {
+        +TestOrchestrator orchestrator
+        -_on_run_click() void
+        -_on_run_all_categories_click() void
+    }
+
+    PrimitiveAPIFrame *-- CliOrchestrator
+    PrimitiveAPIFrame ..> graph_structure_module : usa
+    UnitTestFrame *-- TestOrchestrator
