@@ -135,6 +135,11 @@ Rebuild_Delta/
 - Paulo Henrique Rodrigues Neves
 - Daniel Lucas Soares Madureira
 - Vinicius Cezar Pereira Menezes
+
+## Apêndice
+- [Apresentação em Streamlit](https://github.com/kasshinokun/TP_Grafos_2026_1/blob/main/Gabriel_Code/Rebuild_Delta/apresentacao/TP_Apresentacao_Streamlit.py)
+- [Diagrama prévio de classes](https://github.com/kasshinokun/TP_Grafos_2026_1/blob/main/Gabriel_Code/Rebuild_Delta/apresentacao/diagrama_classes_PureNetworkX.mermaid)
+
 ## 📄 Licença
 Este projeto está licenciado sob a GNU General Public License v3.0.
 Veja o nosso arquivo [LICENSE.md](https://github.com/kasshinokun/TP_Grafos_2026_1/blob/main/LICENSE.md) para mais detalhes.
